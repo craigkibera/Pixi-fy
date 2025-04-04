@@ -1,0 +1,20 @@
+                          STEPS TO WORK ON A DEVELOPMENT FILE
+git clone <repository_url>
+git clone https://github.com/username/repository.git
+cd repository
+git branch -a      #You'll likely see main or master as the default branch.
+git checkout -b pixify-Development
+git switch -c pixify-Development
+git push -u origin pixify-Development
+
+Start Working and Committing Changes
+git add .
+git commit -m "Added new feature"
+git push origin pixify-Development
+
+
+        NOTE!
+Do not attempt pushing any code to Main or Master branches.
+
+  HAPPY CODING GROUP 10!
+
