@@ -1,22 +1,27 @@
 from flask import Flask
-from flask_restful import Api
-from resources import HelloWorld
-from models import db
 from flask_migrate import Migrate
+from flask_restful import Api
+from extensions import db, bcrypt  # Import from extensions.py
+from resources import HelloWorld  # Import your resources (e.g., HelloWorld)
 
+# Create your app instance
 app = Flask(__name__)
-# Configure SQLite Database
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///pixify.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-#initialize extension
+# Configure the app (for example, database URI)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pixify.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize the extensions
 db.init_app(app)
+bcrypt.init_app(app)
+
+# Set up migration
 migrate = Migrate(app, db)
+
+# Initialize API
 api = Api(app)
 
-
-# Add the HelloWorld resource to the API
+# Register your API resources
 api.add_resource(HelloWorld, '/')
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# Optionally, add more routes or resources here
