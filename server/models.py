@@ -50,11 +50,13 @@ class User(db.Model,SerializerMixin):
     date_created = db.Column(db.DateTime, default=db.func.now())
     posts = db.relationship("Post", back_populates="author", cascade='all, delete-orphan')
 
+    comments = db.relationship('Comment', back_populates='user', lazy=True) #added these line
     followers = db.relationship("Follow", foreign_keys=[Follow.followed_id], back_populates="followed_user")
     following = db.relationship("Follow", foreign_keys=[Follow.follower_id], back_populates="follower_user")
 
     profile = db.relationship("Profile", back_populates="user", uselist=False, cascade='all, delete-orphan')
     likes = db.relationship("Like", back_populates="user", cascade='all, delete-orphan')
+    #comments = relationship("Comment", back_populates="user", cascade="all, delete-orphan")
 
     serialize_rules = ("-password_hash", "-posts.author", "-profile.user")
     def __repr__(self):
@@ -106,7 +108,7 @@ class Post(db.Model, SerializerMixin):
     author = db.relationship("User", back_populates="posts")
     likes = db.relationship("Like", back_populates="post", cascade='all, delete-orphan')
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-
+    #comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
     def __repr__(self):
         return f'<post {self.title}, {self.body}, {self.created_at}, {self.updated_at}, {self.author_id}>'
 
@@ -146,7 +148,9 @@ class Comment(db.Model, SerializerMixin):
     parent_comment = db.relationship("Comment", remote_side=[id], back_populates="replies")
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
     post = db.relationship("Post", back_populates="comments")
-
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)# i added these line
+    user = db.relationship("User", back_populates="comments")  #added these line
+   
     def __repr__(self):
         return f"<comments {self.id}, {self.body}, {self.created_at}>"
 
@@ -156,6 +160,7 @@ class Comment(db.Model, SerializerMixin):
         "body":self.body,
         "created_at":self.created_at,
         "post_id": self.post_id,
+        "user_id": self.user_id,
         "parent_comment":self.parent_comment,
         "replies": [reply.to_dict() for reply in self.replies]
     }
