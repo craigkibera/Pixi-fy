@@ -3,6 +3,7 @@ from flask_migrate import Migrate
 from flask_restful import Api
 from extensions import db, bcrypt  # Import from extensions.py
 from resources import HelloWorld  # Import your resources (e.g., HelloWorld)
+from authentication import SignUp, Login
 
 # Create your app instance
 app = Flask(__name__)
@@ -23,5 +24,11 @@ api = Api(app)
 
 # Register your API resources
 api.add_resource(HelloWorld, '/')
+api.add_resource(SignUp, '/signup')
+api.add_resource(Login, '/login')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 # Optionally, add more routes or resources here
