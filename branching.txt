@@ -3,11 +3,12 @@
 git clone <repository_url>
 cd repository
 git branch -a   #You'll likely see main or master as the default branch.
-git checkout -b pixify-Development
 git switch -c pixify-Development
+git checkout -b pixify-Development
+
 git push -u origin pixify-Development
 
--Start Working and Committing Changes
+-Start Working angit d Committing Changes
 
 git add .
 git commit -m "Added new feature"
