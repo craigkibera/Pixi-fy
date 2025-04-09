@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from extensions import db
 from models import User, Post, Like, Follow, Comment, Profile
 from datetime import datetime
-
+from flask_cors import CORS
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pixify.db'  
@@ -10,6 +10,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize the database with the Flask app
 db.init_app(app)
+CORS(app)
 
 # Route to get all likes
 @app.route('/likes', methods=['GET'])
@@ -107,6 +108,12 @@ def create_post():
         return jsonify({"message": str(e)}), 400
 
 # Route to add a comment to a post (POST)
+#GET comments
+@app.route('/comments', methods=['GET'])
+def get_all_comments():
+    comments = Comment.query.all()
+    return jsonify([comment.to_dict() for comment in comments])
+
 @app.route('/comment', methods=['POST'])
 def add_comment():
     data = request.get_json()
@@ -123,6 +130,12 @@ def add_comment():
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 400
+    
+
+@app.route('/post', methods=['GET'])
+def get_all_posts():
+    posts = Post.query.order_by(Post.id.desc()).all()  # Order by id descending
+    return jsonify([post.to_dict() for post in posts]), 200
 
 # Route to get a user's profile
 @app.route('/profile/<int:user_id>', methods=['GET'])
