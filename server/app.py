@@ -15,7 +15,17 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 CORS(app)
 db.init_app(app)
-CORS(app)
+bcrypt.init_app(app)
+
+migrate = Migrate(app, db)
+
+# Initialize API
+api = Api(app)
+
+# Register your API resources
+api.add_resource(HelloWorld, '/')
+api.add_resource(SignUp, '/signup')
+api.add_resource(Login, '/login')
 
 
 @app.route('/')
