@@ -1,22 +1,22 @@
 from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api
-from extensions import db, bcrypt  # Import from extensions.py
-from resources import HelloWorld  # Import your resources (e.g., HelloWorld)
+from extensions import db, bcrypt
+from resources import HelloWorld
 from authentication import SignUp, Login
+from models import db, User, Post, Comment, Like, Follow, Profile
 
-# Create your app instance
 app = Flask(__name__)
 
-# Configure the app (for example, database URI)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pixify.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialize the extensions
+CORS(app)
 db.init_app(app)
 bcrypt.init_app(app)
 
-# Set up migration
 migrate = Migrate(app, db)
 
 # Initialize API
@@ -27,122 +27,253 @@ api.add_resource(HelloWorld, '/')
 api.add_resource(SignUp, '/signup')
 api.add_resource(Login, '/login')
 
-# USERS
-@app.route('/users/<int:user_id>', methods=['GET'])
-def get_user(user_id):
-    user = User.query.get_or_404(user_id)
-    return jsonify(user.to_dict()), 200
 
-@app.route('/users/<int:user_id>/follow/<int:followed_id>', methods=['POST'])
-def follow_user(user_id, followed_id):
-    user = User.query.get_or_404(user_id)
-    followed = User.query.get_or_404(followed_id)
+@app.route('/')
+def home():
+    return "Hello, Flask!"
 
-    if Follow.query.filter_by(follower_id=user.id, followed_id=followed.id).first():
-        return jsonify({'message': 'Already following'}), 400
 
-    follow = Follow(follower_id=user.id, followed_id=followed.id)
-    db.session.add(follow)
-    db.session.commit()
-    return jsonify({'message': f'{user.username} now follows {followed.username}'}), 200
+@app.route('/users', methods=['GET'])
+def get_users():
+    try:
+        users = User.query.all()
+        return jsonify([user.to_dict_basic() for user in users]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-@app.route('/users/<int:user_id>/unfollow/<int:followed_id>', methods=['DELETE'])
-def unfollow_user(user_id, followed_id):
-    follow = Follow.query.filter_by(follower_id=user_id, followed_id=followed_id).first()
-    if follow:
-        db.session.delete(follow)
+
+@app.route('/users/<int:id>', methods=['GET'])
+def get_user(id):
+    try:
+        user = User.query.get_or_404(id)
+        return jsonify(user.to_dict_basic()), 200
+    except Exception as e:
+        return jsonify({"error": "User not found"}), 404
+
+
+@app.route('/users/<int:id>', methods=['PATCH'])
+def update_user(id):
+    data = request.get_json()
+    try:
+        user = User.query.get_or_404(id)
+        if 'first_name' in data:
+            user.first_name = data['first_name']
+        if 'last_name' in data:
+            user.last_name = data['last_name']
         db.session.commit()
-        return jsonify({'message': 'Unfollowed successfully'}), 200
-    return jsonify({'message': 'Not following'}), 404
+        return jsonify(user.to_dict_basic()), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
-@app.route('/users/<int:user_id>/followers', methods=['GET'])
-def get_followers(user_id):
-    followers = Follow.query.filter_by(followed_id=user_id).all()
-    return jsonify([User.query.get(f.follower_id).to_dict() for f in followers]), 200
 
-@app.route('/users/<int:user_id>/following', methods=['GET'])
-def get_following(user_id):
-    following = Follow.query.filter_by(follower_id=user_id).all()
-    return jsonify([User.query.get(f.followed_id).to_dict() for f in following]), 200
+@app.route('/users/<int:id>', methods=['DELETE'])
+def delete_user(id):
+    try:
+        user = User.query.get_or_404(id)
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({"message": "User deleted"}), 200
+    except Exception as e:
+        return jsonify({"error": "User not found"}), 404
 
-# POSTS
+
+@app.route('/posts', methods=['GET'])
+def get_posts():
+    try:
+        posts = Post.query.all()
+        return jsonify([post.to_dict() for post in posts]), 200
+    except Exception as e:
+        return jsonify({"error": "Unable to fetch posts"}), 500
+
+
 @app.route('/posts', methods=['POST'])
 def create_post():
     data = request.get_json()
-    post = Post(
-        content=data['content'],
-        media_url=data.get('media_url'),
-        user_id=data['user_id']
-    )
-    db.session.add(post)
-    db.session.commit()
-    return jsonify(post.to_dict()), 201
+    try:
+        new_post = Post(title=data['title'], body=data['body'], author_id=data['author_id'])
+        db.session.add(new_post)
+        db.session.commit()
+        return jsonify(new_post.to_dict()), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
-@app.route('/posts', methods=['GET'])
-def get_all_posts():
-    posts = Post.query.order_by(Post.timestamp.desc()).all()
-    return jsonify([post.to_dict() for post in posts]), 200
 
-@app.route('/posts/<int:post_id>', methods=['PATCH'])
-def update_post(post_id):
-    post = Post.query.get_or_404(post_id)
+@app.route('/posts/<int:id>', methods=['GET'])
+def get_post(id):
+    try:
+        post = Post.query.get_or_404(id)
+        return jsonify(post.to_dict()), 200
+    except Exception as e:
+        return jsonify({"error": "Post not found"}), 404
+
+
+@app.route('/posts/<int:id>', methods=['PATCH'])
+def update_post(id):
     data = request.get_json()
-    post.content = data.get('content', post.content)
-    post.media_url = data.get('media_url', post.media_url)
-    db.session.commit()
-    return jsonify(post.to_dict()), 200
+    try:
+        post = Post.query.get_or_404(id)
+        if 'title' in data:
+            post.title = data['title']
+        if 'body' in data:
+            post.body = data['body']
+        db.session.commit()
+        return jsonify(post.to_dict()), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
-@app.route('/posts/<int:post_id>', methods=['DELETE'])
-def delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    db.session.delete(post)
-    db.session.commit()
-    return jsonify({'message': 'Post deleted'}), 200
 
-@app.route('/users/<int:user_id>/feed', methods=['GET'])
-def user_feed(user_id):
-    following = Follow.query.filter_by(follower_id=user_id).all()
-    followed_ids = [f.followed_id for f in following] + [user_id]
-    posts = Post.query.filter(Post.user_id.in_(followed_ids)).order_by(Post.timestamp.desc()).all()
-    return jsonify([post.to_dict() for post in posts]), 200
+@app.route('/posts/<int:id>', methods=['DELETE'])
+def delete_post(id):
+    try:
+        post = Post.query.get_or_404(id)
+        db.session.delete(post)
+        db.session.commit()
+        return jsonify({"message": "Post deleted"}), 200
+    except Exception as e:
+        return jsonify({"error": "Post not found"}), 404
 
-# COMMENTS
+
+@app.route('/comments', methods=['GET'])
+def get_comments():
+    try:
+        comments = Comment.query.all()
+        return jsonify([comment.to_dict() for comment in comments]), 200
+    except Exception as e:
+        return jsonify({"error": "Unable to fetch comments"}), 500
+
+
 @app.route('/comments', methods=['POST'])
 def create_comment():
     data = request.get_json()
-    comment = Comment(
-        content=data['content'],
-        user_id=data['user_id'],
-        post_id=data['post_id']
-    )
-    db.session.add(comment)
-    db.session.commit()
-    return jsonify(comment.to_dict()), 201
+    try:
+        new_comment = Comment(body=data['body'], post_id=data['post_id'])
+        db.session.add(new_comment)
+        db.session.commit()
+        return jsonify(new_comment.to_dict()), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
-@app.route('/posts/<int:post_id>/comments', methods=['GET'])
-def get_post_comments(post_id):
-    post = Post.query.get_or_404(post_id)
-    return jsonify([comment.to_dict() for comment in post.comments]), 200
 
-# LIKES
-@app.route('/likes', methods=['POST'])
-def create_like():
+@app.route('/comments/<int:id>', methods=['GET'])
+def get_comment(id):
+    try:
+        comment = Comment.query.get_or_404(id)
+        return jsonify(comment.to_dict()), 200
+    except Exception as e:
+        return jsonify({"error": "Comment not found"}), 404
+
+
+@app.route('/comments/<int:id>', methods=['DELETE'])
+def delete_comment(id):
+    try:
+        comment = Comment.query.get_or_404(id)
+        db.session.delete(comment)
+        db.session.commit()
+        return jsonify({"message": "Comment deleted"}), 200
+    except Exception as e:
+        return jsonify({"error": "Comment not found"}), 404
+
+
+@app.route('/profiles', methods=['GET'])
+def get_profiles():
+    try:
+        profiles = Profile.query.all()
+        return jsonify([profile.to_dict() for profile in profiles]), 200
+    except Exception as e:
+        return jsonify({"error": "Unable to fetch profiles"}), 500
+
+
+@app.route('/profiles', methods=['POST'])
+def create_profile():
     data = request.get_json()
-    like = Like(
-        reaction_type=data.get('reaction_type', 'like'),
-        user_id=data['user_id'],
-        post_id=data['post_id']
-    )
-    db.session.add(like)
-    db.session.commit()
-    return jsonify(like.to_dict()), 201
+    try:
+        new_profile = Profile(location=data['location'], profile_image=data['profile_image'],
+                              website=data['website'], bio=data['bio'], user_id=data['user_id'])
+        db.session.add(new_profile)
+        db.session.commit()
+        return jsonify(new_profile.to_dict()), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
-@app.route('/posts/<int:post_id>/likes', methods=['GET'])
-def get_post_likes(post_id):
-    post = Post.query.get_or_404(post_id)
-    return jsonify([like.to_dict() for like in post.likes]), 200
 
-# MAIN
+@app.route('/profiles/<int:id>', methods=['GET'])
+def get_profile(id):
+    try:
+        profile = Profile.query.get_or_404(id)
+        return jsonify(profile.to_dict()), 200
+    except Exception as e:
+        return jsonify({"error": "Profile not found"}), 404
+
+
+@app.route('/profiles/<int:id>', methods=['PATCH'])
+def update_profile(id):
+    data = request.get_json()
+    try:
+        profile = Profile.query.get_or_404(id)
+        if 'location' in data:
+            profile.location = data['location']
+        if 'bio' in data:
+            profile.bio = data['bio']
+        db.session.commit()
+        return jsonify(profile.to_dict()), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route('/likes', methods=['POST'])
+def like_post():
+    data = request.get_json()
+    try:
+        new_like = Like(user_id=data['user_id'], post_id=data['post_id'])
+        db.session.add(new_like)
+        db.session.commit()
+        return jsonify(new_like.to_dict()), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route('/likes/<int:id>', methods=['DELETE'])
+def unlike_post(id):
+    try:
+        like = Like.query.get_or_404(id)
+        db.session.delete(like)
+        db.session.commit()
+        return jsonify({"message": "Like removed"}), 200
+    except Exception as e:
+        return jsonify({"error": "Like not found"}), 404
+
+
+@app.route('/follows', methods=['POST'])
+def follow_user():
+    data = request.get_json()
+    try:
+        new_follow = Follow(follower_id=data['follower_id'], followed_id=data['followed_id'])
+        db.session.add(new_follow)
+        db.session.commit()
+        return jsonify(new_follow.to_dict()), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route('/follows/<int:id>', methods=['DELETE'])
+def unfollow_user(id):
+    try:
+        follow = Follow.query.get_or_404(id)
+        db.session.delete(follow)
+        db.session.commit()
+        return jsonify({"message": "Unfollowed user"}), 200
+    except Exception as e:
+        return jsonify({"error": "Follow not found"}), 404
+
+
+@app.route('/follows', methods=['GET'])
+def get_follows():
+    try:
+        follows = Follow.query.all()
+        return jsonify([follow.to_dict() for follow in follows]), 200
+    except Exception as e:
+        return jsonify({"error": "Unable to fetch follows"}), 500
+
+
 if __name__ == '__main__':
     app.run(debug=True)
-

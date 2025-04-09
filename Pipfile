@@ -10,6 +10,10 @@ python_version = "3.12.3"  # Specify the Python version you want to use
 flask = "*"  # You can specify a version or leave it as "*" to get the latest version of Flask
 flask-restful = "*"
 flask-sqlalchemy = "*"
+flask-bcrypt = "*"
 sqlalchemy-serializer = "*"
+flask-migrate = "*"
+bcrypt = "*"
+flask-cors = "*"
 
 [dev-packages]
