@@ -100,6 +100,7 @@ class Post(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     body = db.Column(db.Text, nullable=False)
+    image_url = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now())
    # author_id = db.Column(db.Integer, db.ForeignKey('users.id'),back_populates="posts", nullable=False)
@@ -117,6 +118,7 @@ class Post(db.Model, SerializerMixin):
             "id":self.id,
             "title":self.title,
             "body":self.body,
+            "image_url": self.image_url,
             "created_at":self.created_at,
             "updated_at":self.updated_at,
             "author_id":self.author_id
@@ -136,6 +138,7 @@ class Post(db.Model, SerializerMixin):
         if len(body) < 4:
             raise ValueError("The body must have atleast 4 characters long.")
         return body
+
 
 
 class Comment(db.Model, SerializerMixin):

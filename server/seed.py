@@ -48,21 +48,21 @@ def seed_database():
         profiles = [
             Profile(
                 location="New York",
-                profile_image="https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                profile_image="https://plus.unsplash.com/premium_vector-1727492261543-b6417bba231b?q=80&w=2148&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                 website="https://verpex.com/blog/marketing-tips/10-most-popular-types-of-websites",
                 bio="Software engineer passionate about web development and open source.",
                 user_id=users[0].id
             ),
             Profile(
                 location="San Francisco",
-                profile_image="https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                profile_image="https://plus.unsplash.com/premium_vector-1727492261543-b6417bba231b?q=80&w=2148&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                 website="https://verpex.com/blog/marketing-tips/10-most-popular-types-of-websites",
                 bio="Digital marketer with 5 years of experience in tech companies.",
                 user_id=users[1].id
             ),
             Profile(
                 location="Chicago",
-                profile_image="https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                profile_image="https://plus.unsplash.com/premium_vector-1727492261543-b6417bba231b?q=80&w=2148&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                 website="https://verpex.com/blog/marketing-tips/10-most-popular-types-of-websites",
                 bio="Graphic designer and illustrator creating beautiful visuals.",
                 user_id=users[2].id
@@ -77,16 +77,19 @@ def seed_database():
             Post(
                 title="My First Blog Post",
                 body="This is the content of my first blog post. I'm excited to start blogging!",
+                image_url="https://plus.unsplash.com/premium_vector-1714233398084-0bdf1101f2d8?q=80&w=2360&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                 author_id=users[0].id
             ),
             Post(
                 title="Web Development Tips",
                 body="Here are some tips I've learned after 5 years of web development experience.",
+                image_url="https://plus.unsplash.com/premium_vector-1714233398084-0bdf1101f2d8?q=80&w=2360&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                 author_id=users[1].id
             ),
             Post(
                 title="Design Principles",
                 body="Key design principles every developer should know to create better UIs.",
+                image_url="https://plus.unsplash.com/premium_vector-1714233398084-0bdf1101f2d8?q=80&w=2360&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                 author_id=users[2].id
             )
         ]
