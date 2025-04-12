@@ -12,7 +12,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:5000/profiles/${userId}`)
+        const res = await fetch(`https://pixi-fy.onrender.com/profiles/${userId}`)
         if (!res.ok) throw new Error('Failed to fetch profile')
         const data = await res.json()
         setProfile(data)
@@ -30,7 +30,7 @@ export default function Profile() {
 
   const handleUpdate = async () => {
     try {
-      const res = await fetch(`http://127.0.0.1:5000/profiles/${userId}`, {
+      const res = await fetch(`https://pixi-fy.onrender.com/profiles/${userId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

@@ -22,7 +22,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:5000/profiles/${currentUserId}`);
+        const response = await fetch(`https://pixi-fy.onrender.com/profiles/${currentUserId}`);
         if (!response.ok) {
           throw new Error("Failed to load profile");
         }
@@ -69,7 +69,7 @@ const Profile = () => {
       return;
     }
     try {
-      const response = await fetch(`http://127.0.0.1:5000/profiles/${currentUserId}`, {
+      const response = await fetch(`https://pixi-fy.onrender.com/profiles/${currentUserId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +109,7 @@ const Profile = () => {
         website,
         user_id: currentUserId,
       };
-      const response = await fetch("http://127.0.0.1:5000/profiles", {
+      const response = await fetch("https://pixi-fy.onrender.com/profiles", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

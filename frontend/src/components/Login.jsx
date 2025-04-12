@@ -18,7 +18,7 @@ const LoginForm = () => {
     initialValues: { email: "", password: "" },
     validationSchema: formSchema,
     onSubmit: (values) => {
-      fetch("http://127.0.0.1:5000/login", {
+      fetch("https://pixi-fy.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),

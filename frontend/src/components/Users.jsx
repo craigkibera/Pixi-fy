@@ -6,7 +6,7 @@ const Users = () => {
   const [newUser, setNewUser] = useState({ first_name: "", last_name: "" });
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/users")
+    fetch("https://pixi-fy.onrender.com/users")
       .then((res) => res.json())
       .then((data) => setUsers(data))
       .catch((error) => console.error("Error fetching users:", error));
@@ -19,7 +19,7 @@ const Users = () => {
 
   const handleAddUser = (e) => {
     e.preventDefault();
-    fetch("http://127.0.0.1:5000/users", {
+    fetch("https://pixi-fy.onrender.com/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,7 +32,7 @@ const Users = () => {
   };
 
   const handleDeleteUser = (id) => {
-    fetch(`http://127.0.0.1:5000/users/${id}`, { method: "DELETE" })
+    fetch(`https://pixi-fy.onrender.com/users/${id}`, { method: "DELETE" })
       .then(() => setUsers(users.filter((user) => user.id !== id)))
       .catch((error) => console.error("Error deleting user:", error));
   };

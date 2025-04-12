@@ -27,12 +27,12 @@ const Home = () => {
           commentsRes,
           followsRes
         ] = await Promise.all([
-          fetch("http://127.0.0.1:5000/posts"),
-          fetch("http://127.0.0.1:5000/users"),
-          fetch("http://127.0.0.1:5000/profiles"),
-          fetch("http://127.0.0.1:5000/likes"),
-          fetch("http://127.0.0.1:5000/comments"),
-          currentUserId ? fetch("http://127.0.0.1:5000/follows") : Promise.resolve(null),
+          fetch("https://pixi-fy.onrender.com/posts"),
+          fetch("https://pixi-fy.onrender.com/users"),
+          fetch("https://pixi-fy.onrender.com/profiles"),
+          fetch("https://pixi-fy.onrender.com/likes"),
+          fetch("https://pixi-fy.onrender.com/comments"),
+          currentUserId ? fetch("https://pixi-fy.onrender.com/follows") : Promise.resolve(null),
         ]);
 
         const postsData = await postsRes.json();
@@ -104,7 +104,7 @@ const Home = () => {
   const handleLike = async (postId, likeId) => {
     try {
       if (likeId) {
-        await fetch(`http://127.0.0.1:5000/likes/${likeId}`, {
+        await fetch(`https://pixi-fy.onrender.com/likes/${likeId}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -121,7 +121,7 @@ const Home = () => {
         ));
         toast.info("Removed like");
       } else {
-        const response = await fetch("http://127.0.0.1:5000/likes", {
+        const response = await fetch("https://pixi-fy.onrender.com/likes", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -156,7 +156,7 @@ const Home = () => {
     try {
       if (!isFollowing) {
         // Follow the user
-        const response = await fetch("http://127.0.0.1:5000/follows", {
+        const response = await fetch("https://pixi-fy.onrender.com/follows", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -184,12 +184,12 @@ const Home = () => {
       } else {
         // To unfollow: First, get the follow record using our GET route with query parameters
         const followRes = await fetch(
-          `http://127.0.0.1:5000/follows?follower_id=${currentUserId}&followed_id=${authorId}`
+          `https://pixi-fy.onrender.com/follows?follower_id=${currentUserId}&followed_id=${authorId}`
         );
         const followData = await followRes.json();
         if (followData.length > 0) {
           const followId = followData[0].id;
-          const response = await fetch(`http://127.0.0.1:5000/follows/${followId}`, {
+          const response = await fetch(`https://pixi-fy.onrender.com/follows/${followId}`, {
             method: "DELETE"
           });
           if (response.ok) {
@@ -235,7 +235,7 @@ const Home = () => {
     const commentText = commentInputs[postId];
     if (!commentText) return;
     try {
-      const response = await fetch("http://127.0.0.1:5000/comments", {
+      const response = await fetch("https://pixi-fy.onrender.com/comments", {
         method: 'POST',
         headers: {
           "Content-Type": "application/json"
